@@ -11,22 +11,18 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import com.sanityinc.jargs.CmdLineParser;
-import com.sanityinc.jargs.CmdLineParser.Option;
-import com.sanityinc.jargs.CmdLineParser.OptionException;
-
 import jenes.GeneticAlgorithm;
 import jenes.chromosome.PermutationChromosome;
 import jenes.population.Fitness;
 import jenes.population.Individual;
 import jenes.population.Population;
 import jenes.population.Population.Statistics.Group;
-import jenes.stage.AbstractStage;
-import jenes.stage.operator.common.OnePointCrossover;
-import jenes.stage.operator.common.SimpleMutator;
-import jenes.stage.operator.common.TournamentSelector;
 import jenes.tutorials.utils.Utils;
 import at.genetic.culture.CulturalGA;
+
+import com.sanityinc.jargs.CmdLineParser;
+import com.sanityinc.jargs.CmdLineParser.Option;
+import com.sanityinc.jargs.CmdLineParser.OptionException;
 
 public class SchoolBusCulture {
 
@@ -35,25 +31,76 @@ public class SchoolBusCulture {
 
 	/**
 	 * @param args
-	 * @throws OptionException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public static void main(String[] args) throws OptionException, IOException {
+	public static void main(String[] args) throws Exception {
 
 		CmdLineParser cmd = new CmdLineParser();
-		Option<String> areaMapOption = cmd.addStringOption('m', "map");
+		Option<String> areaMapOption = cmd.addStringOption('a', "area");
+		Option<Integer> numGenOption = cmd.addIntegerOption('n', "numgen");
+		Option<Integer> populationSizeOption = cmd.addIntegerOption('p', "pop");
+		Option<Double> mutationPropOption = cmd
+				.addDoubleOption('m', "mutation");
+		Option<Double> crossoverPropOption = cmd.addDoubleOption('c',
+				"crossover");
+		Option<Double> costPerBusOption = cmd.addDoubleOption('b', "buscost");
+		Option<Double> costPerKmOption = cmd.addDoubleOption('k', "kmcost");
+		Option<Boolean> helpOption = cmd.addBooleanOption('h', "help");
 		cmd.parse(args);
 
+		boolean help = cmd.getOptionValue(helpOption, false);
+		
+		if (help) {
+			printHelp();
+			return;
+		}
+		
 		String areaMapPath = cmd.getOptionValue(areaMapOption);
+		int numGen = cmd.getOptionValue(numGenOption, 100);
+		int popSize = cmd.getOptionValue(populationSizeOption, 10);
+		double mutationProp = cmd.getOptionValue(mutationPropOption, 0.02);
+		double crossoverProp = cmd.getOptionValue(crossoverPropOption, 0.8);
+		Double costPerBus = cmd.getOptionValue(costPerBusOption);
+		Double costPerKm = cmd.getOptionValue(costPerKmOption);
 
 		SchoolArea areaMap = loadMapFromPath(areaMapPath);
 
-		SchoolBusCulture culture = new SchoolBusCulture(areaMap);
+		if (costPerBus != null) {
+			areaMap.setCostPerBus(costPerBus);
+		}
+
+		if (costPerKm != null) {
+			areaMap.setCostPerKm(costPerKm);
+		}
+
+		SchoolBusCulture culture = new SchoolBusCulture(areaMap, numGen,
+				popSize, mutationProp, crossoverProp);
 		culture.run();
 		culture.printStats();
 	}
 
-	public SchoolBusCulture(SchoolArea area) {
+	private static void printHelp() {
+		System.out.println("School Bus Culture");
+		System.out.println();
+		System.out.println("Possible Options are:");
+		System.out.println();
+		System.out.println("Problem specific options:");
+		System.out.println("	-a --area	Spezify an file with are setup [mandatory]");
+		System.out.println("	-b --buscost	Cost per bus (1000)");
+		System.out.println("	-k --kmcost	Cost per km (0.7)");
+		System.out.println();
+		System.out.println("Genetic algorithm options:");
+		System.out.println("	-n --numgen	Number of generations (100)");
+		System.out.println("	-p --pop	Size of population (10)");
+		System.out.println("	-m --mutation	Probability for mutation (0.02)");
+		System.out.println("	-c --crossover	Probability for crossover (0.8)");
+		System.out.println();
+		System.out.println("General options:");
+		System.out.println("	-h --help	This help text");
+
+	}
+
+	public SchoolBusCulture(SchoolArea area, int numGen, int popSize, double mutationProp, double crossoverProp) {
 		this.area = area;
 
 		PermutationChromosome sampleChrom = new PermutationChromosome(
@@ -61,29 +108,16 @@ public class SchoolBusCulture {
 		Individual<PermutationChromosome> sample = new Individual<PermutationChromosome>(
 				sampleChrom);
 		Population<PermutationChromosome> pop = new Population<PermutationChromosome>(
-				sample, 10);
-
+				sample, popSize);
 		Fitness<PermutationChromosome> fit = new ScheduleFitness(area);
 
-		ga = new CulturalGA<PermutationChromosome>(fit, pop, 100);
-
-		AbstractStage<PermutationChromosome> selection = new TournamentSelector<PermutationChromosome>(
-				3);
-		AbstractStage<PermutationChromosome> crossover = new OnePointCrossover<PermutationChromosome>(
-				0.8);
-		AbstractStage<PermutationChromosome> mutation = new SimpleMutator<PermutationChromosome>(
-				0.2);
-		ga.addStage(selection);
-		ga.addStage(crossover);
-		ga.addStage(mutation);
-
-		ga.setElitism(1);
+		ga = new CulturalGA<PermutationChromosome>(fit, pop, numGen, mutationProp, crossoverProp);
 	}
 
 	private void run() {
 		ga.evolve();
 	}
-	
+
 	private void printStats() {
 		Population.Statistics stats = ga.getCurrentPopulation().getStatistics();
 		GeneticAlgorithm.Statistics algostats = ga.getStatistics();
@@ -105,7 +139,7 @@ public class SchoolBusCulture {
 
 		Utils.printStatistics(stats);
 	}
-	
+
 	private void openGui() {
 		JFrame frame = new JFrame("School Bus Culture");
 
@@ -113,7 +147,7 @@ public class SchoolBusCulture {
 		BoxLayout layout = new BoxLayout(p, BoxLayout.PAGE_AXIS);
 		p.setLayout(layout);
 
-		// Add some drawing panel and display the map
+		// Add some drawing panel and display the area map
 		// add another drawing panel and print live stats
 		// we need threads for this
 
@@ -124,8 +158,7 @@ public class SchoolBusCulture {
 		frame.setVisible(true);
 	}
 
-	private static SchoolArea loadMapFromPath(String areaPath)
-			throws IOException {
+	private static SchoolArea loadMapFromPath(String areaPath) throws Exception {
 		File file = new File(areaPath);
 		FileReader reader = new FileReader(file);
 		BufferedReader breader = new BufferedReader(reader);
