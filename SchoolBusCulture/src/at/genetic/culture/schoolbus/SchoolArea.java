@@ -56,6 +56,10 @@ public class SchoolArea {
 		
 		return new double[] {kmCosts, busCosts};
 	}
+	
+	public int countStops() {
+		return busStops.length;
+	}
 
 	private double distance(BusStop a, BusStop b) {
 		//System.out.println("dist between " + a + " and " + b);
