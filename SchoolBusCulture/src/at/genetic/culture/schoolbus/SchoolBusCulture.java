@@ -65,7 +65,7 @@ public class SchoolBusCulture {
 
 		Fitness<PermutationChromosome> fit = new ScheduleFitness(area);
 
-		ga = new CulturalGA<PermutationChromosome>(fit, pop, 1);
+		ga = new CulturalGA<PermutationChromosome>(fit, pop, 100);
 
 		AbstractStage<PermutationChromosome> selection = new TournamentSelector<PermutationChromosome>(
 				3);
