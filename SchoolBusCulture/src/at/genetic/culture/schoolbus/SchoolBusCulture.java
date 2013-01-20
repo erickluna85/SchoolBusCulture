@@ -76,7 +76,6 @@ public class SchoolBusCulture {
 		SchoolBusCulture culture = new SchoolBusCulture(areaMap, numGen,
 				popSize, mutationProp, crossoverProp);
 		culture.run();
-		culture.printStats();
 	}
 
 	private static void printHelp() {
@@ -112,32 +111,14 @@ public class SchoolBusCulture {
 		Fitness<PermutationChromosome> fit = new ScheduleFitness(area);
 
 		ga = new CulturalGA<PermutationChromosome>(fit, pop, numGen, mutationProp, crossoverProp);
+		
+		StatisticListner listener = new StatisticListner();
+		ga.addGenerationEventListener(listener);
+		ga.addAlgorithmEventListener(listener);
 	}
 
 	private void run() {
 		ga.evolve();
-	}
-
-	private void printStats() {
-		Population.Statistics stats = ga.getCurrentPopulation().getStatistics();
-		GeneticAlgorithm.Statistics algostats = ga.getStatistics();
-
-		Fitness<PermutationChromosome> fit = ga.getFitness();
-		System.out.println("Objective: "
-				+ (fit.getBiggerIsBetter()[0] ? "Max! (All true)"
-						: "Min! (None true)"));
-		System.out.println(fit.getBiggerIsBetter().length);
-
-		Group legals = stats.getGroup(Population.LEGALS);
-
-		Individual solution = legals.get(0);
-
-		System.out.println("Solution: ");
-		System.out.println(solution.toCompleteString());
-		System.out.format("found in %d ms.\n", algostats.getExecutionTime());
-		System.out.println();
-
-		Utils.printStatistics(stats);
 	}
 
 	private void openGui() {
