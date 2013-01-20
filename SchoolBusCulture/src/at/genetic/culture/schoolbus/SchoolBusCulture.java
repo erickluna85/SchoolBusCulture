@@ -1,32 +1,21 @@
 package at.genetic.culture.schoolbus;
 
-import java.awt.BorderLayout;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import jenes.GeneticAlgorithm;
 import jenes.chromosome.PermutationChromosome;
 import jenes.population.Fitness;
 import jenes.population.Individual;
 import jenes.population.Population;
-import jenes.population.Population.Statistics.Group;
-import jenes.tutorials.utils.Utils;
 import at.genetic.culture.CulturalGA;
 
 import com.sanityinc.jargs.CmdLineParser;
 import com.sanityinc.jargs.CmdLineParser.Option;
-import com.sanityinc.jargs.CmdLineParser.OptionException;
 
 public class SchoolBusCulture {
 
-	private SchoolArea area;
 	private CulturalGA<PermutationChromosome> ga;
 
 	/**
@@ -49,12 +38,12 @@ public class SchoolBusCulture {
 		cmd.parse(args);
 
 		boolean help = cmd.getOptionValue(helpOption, false);
-		
+
 		if (help) {
 			printHelp();
 			return;
 		}
-		
+
 		String areaMapPath = cmd.getOptionValue(areaMapOption);
 		int numGen = cmd.getOptionValue(numGenOption, 100);
 		int popSize = cmd.getOptionValue(populationSizeOption, 10);
@@ -84,7 +73,8 @@ public class SchoolBusCulture {
 		System.out.println("Possible Options are:");
 		System.out.println();
 		System.out.println("Problem specific options:");
-		System.out.println("	-a --area	Spezify an file with are setup [mandatory]");
+		System.out
+				.println("	-a --area	Spezify an file with are setup [mandatory]");
 		System.out.println("	-b --buscost	Cost per bus (1000)");
 		System.out.println("	-k --kmcost	Cost per km (0.7)");
 		System.out.println();
@@ -99,9 +89,8 @@ public class SchoolBusCulture {
 
 	}
 
-	public SchoolBusCulture(SchoolArea area, int numGen, int popSize, double mutationProp, double crossoverProp) {
-		this.area = area;
-
+	public SchoolBusCulture(SchoolArea area, int numGen, int popSize,
+			double mutationProp, double crossoverProp) {
 		PermutationChromosome sampleChrom = new PermutationChromosome(
 				area.countStops());
 		Individual<PermutationChromosome> sample = new Individual<PermutationChromosome>(
@@ -110,9 +99,11 @@ public class SchoolBusCulture {
 				sample, popSize);
 		Fitness<PermutationChromosome> fit = new ScheduleFitness(area);
 
-		ga = new CulturalGA<PermutationChromosome>(fit, pop, numGen, mutationProp, crossoverProp);
-		
-		StatisticListner listener = new StatisticListner(area);
+		ga = new CulturalGA<PermutationChromosome>(fit, pop, numGen,
+				mutationProp, crossoverProp);
+
+		StatisticListner<PermutationChromosome> listener = new StatisticListner<PermutationChromosome>(
+				area);
 		ga.addGenerationEventListener(listener);
 		ga.addAlgorithmEventListener(listener);
 	}
