@@ -1,5 +1,7 @@
 package at.genetic.culture.schoolbus;
 
+import java.util.ArrayList;
+
 public class SchoolArea {
 
 	private BusStop school;
@@ -84,6 +86,16 @@ public class SchoolArea {
 
 	public int countStops() {
 		return busStops.length;
+	}
+	
+	public BusStop[] getAllStops () {
+		ArrayList<BusStop> stops = new ArrayList<BusStop>();
+		stops.add(school);
+		for (BusStop busStop : busStops) {
+			stops.add(busStop);
+		}
+		
+		return stops.toArray(new BusStop[stops.size()]);
 	}
 
 	private double distance(BusStop a, BusStop b) {

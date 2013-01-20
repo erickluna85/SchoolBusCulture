@@ -112,31 +112,13 @@ public class SchoolBusCulture {
 
 		ga = new CulturalGA<PermutationChromosome>(fit, pop, numGen, mutationProp, crossoverProp);
 		
-		StatisticListner listener = new StatisticListner();
+		StatisticListner listener = new StatisticListner(area);
 		ga.addGenerationEventListener(listener);
 		ga.addAlgorithmEventListener(listener);
 	}
 
 	private void run() {
 		ga.evolve();
-	}
-
-	private void openGui() {
-		JFrame frame = new JFrame("School Bus Culture");
-
-		JPanel p = new JPanel();
-		BoxLayout layout = new BoxLayout(p, BoxLayout.PAGE_AXIS);
-		p.setLayout(layout);
-
-		// Add some drawing panel and display the area map
-		// add another drawing panel and print live stats
-		// we need threads for this
-
-		frame.add(p, BorderLayout.CENTER);
-
-		frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
 	}
 
 	private static SchoolArea loadMapFromPath(String areaPath) throws Exception {
