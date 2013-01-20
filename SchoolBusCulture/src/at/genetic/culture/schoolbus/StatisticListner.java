@@ -12,14 +12,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.MinMaxCategoryRenderer;
-import org.jfree.data.category.DefaultCategoryDataset;
-
 import jenes.AlgorithmEventListener;
 import jenes.GenerationEventListener;
 import jenes.GeneticAlgorithm;
@@ -32,10 +24,20 @@ import jenes.population.Population.Statistics;
 import jenes.population.Population.Statistics.Group;
 import jenes.tutorials.utils.Utils;
 
-public class StatisticListner<T extends Chromosome> implements
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
+public class StatisticListner<T extends Chromosome<?>> implements
 		GenerationEventListener<T>, AlgorithmEventListener<T> {
 
 	private SchoolArea area;
+	private XYSeries min;
+	private XYSeries mean;
 
 	public StatisticListner(SchoolArea area) {
 		this.area = area;
@@ -49,10 +51,6 @@ public class StatisticListner<T extends Chromosome> implements
 		BoxLayout layout = new BoxLayout(p, BoxLayout.PAGE_AXIS);
 		p.setLayout(layout);
 
-		// Add some drawing panel and display the area map
-		// add another drawing panel and print live stats
-		// we need threads for this
-
 		p.add(new MapPanel(area));
 
 		frame.add(p, BorderLayout.CENTER);
@@ -60,17 +58,12 @@ public class StatisticListner<T extends Chromosome> implements
 		frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);
-		
 
 		JFrame frame2 = new JFrame("School Bus Culture – Stats");
 		JPanel p2 = new JPanel();
 		// frame.setLayout(new GridLayout());
 		BoxLayout layout2 = new BoxLayout(p, BoxLayout.PAGE_AXIS);
 		p.setLayout(layout2);
-
-		// Add some drawing panel and display the area map
-		// add another drawing panel and print live stats
-		// we need threads for this
 
 		p2.add(getStatPanel());
 
@@ -90,18 +83,19 @@ public class StatisticListner<T extends Chromosome> implements
 	@Override
 	public void onAlgorithmStop(GeneticAlgorithm<T> ga, long time) {
 
-		Population.Statistics stats = ga.getCurrentPopulation().getStatistics();
+		Population.Statistics<?> stats = ga.getCurrentPopulation().getStatistics();
 		GeneticAlgorithm.Statistics algostats = ga.getStatistics();
 
+		@SuppressWarnings("unchecked")
 		Fitness<PermutationChromosome> fit = ga.getFitness();
 		System.out.println("Objective: "
 				+ (fit.getBiggerIsBetter()[0] ? "Max! (All true)"
 						: "Min! (None true)"));
 		System.out.println(fit.getBiggerIsBetter().length);
 
-		Group legals = stats.getGroup(Population.LEGALS);
+		Group<?> legals = stats.getGroup(Population.LEGALS);
 
-		Individual solution = legals.get(0);
+		Individual<?> solution = legals.get(0);
 
 		System.out.println("Solution: ");
 		System.out.println(solution.toCompleteString());
@@ -120,15 +114,19 @@ public class StatisticListner<T extends Chromosome> implements
 	@Override
 	public void onGeneration(GeneticAlgorithm<T> ga, long time) {
 
-		Statistics stat = ga.getCurrentPopulation().getStatistics();
-		Group legals = stat.getGroup(Population.LEGALS);
+		Statistics<?> stat = ga.getCurrentPopulation().getStatistics();
+		Group<?> legals = stat.getGroup(Population.LEGALS);
 		System.out.println("Current generation: " + ga.getGeneration());
 		System.out.println("\tBest score: " + legals.getMin()[0]);
 		System.out.println("\tAvg score : " + legals.getMean()[0]);
+
+		min.add(ga.getGeneration(), legals.getMin()[0]);
+		mean.add(ga.getGeneration(), legals.getMean()[0]);
 	}
 
 	public class MapPanel extends JPanel {
 
+		private static final long serialVersionUID = 3927006095992144643L;
 		private SchoolArea area;
 		private int w = 800;
 		private int h = 800;
@@ -205,58 +203,23 @@ public class StatisticListner<T extends Chromosome> implements
 	}
 
 	public ChartPanel getStatPanel() {
+		min = new XYSeries("min");
+		mean = new XYSeries("mean");
 
-		// create a dataset...
-		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		dataset.addValue(1.0, "First", "Category 1");
-		dataset.addValue(4.0, "First", "Category 2");
-		dataset.addValue(3.0, "First", "Category 3");
-		dataset.addValue(5.0, "First", "Category 4");
-		dataset.addValue(5.0, "First", "Category 5");
-		dataset.addValue(7.0, "First", "Category 6");
-		dataset.addValue(7.0, "First", "Category 7");
-		dataset.addValue(8.0, "First", "Category 8");
-		dataset.addValue(5.0, "Second", "Category 1");
-		dataset.addValue(7.0, "Second", "Category 2");
-		dataset.addValue(6.0, "Second", "Category 3");
-		dataset.addValue(8.0, "Second", "Category 4");
-		dataset.addValue(4.0, "Second", "Category 5");
-		dataset.addValue(4.0, "Second", "Category 6");
-		dataset.addValue(2.0, "Second", "Category 7");
-		dataset.addValue(1.0, "Second", "Category 8");
-		dataset.addValue(4.0, "Third", "Category 1");
-		dataset.addValue(3.0, "Third", "Category 2");
-		dataset.addValue(2.0, "Third", "Category 3");
-		dataset.addValue(3.0, "Third", "Category 4");
-		dataset.addValue(6.0, "Third", "Category 5");
-		dataset.addValue(3.0, "Third", "Category 6");
-		dataset.addValue(4.0, "Third", "Category 7");
-		dataset.addValue(3.0, "Third", "Category 8");
+		XYSeriesCollection dataset = new XYSeriesCollection();
+		dataset.addSeries(min);
+		dataset.addSeries(mean);
 
-		// create the chart...
-		final JFreeChart chart = ChartFactory.createBarChart(
-				"Min/Max Category Plot", // chart title
-				"Category", // domain axis label
-				"Value", // range axis label
-				dataset, // data
-				PlotOrientation.VERTICAL, true, // include legend
-				true, // tooltips
-				false // urls
-				);
+		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+		NumberAxis xAxis = new NumberAxis("generation");
+		NumberAxis yAxis = new NumberAxis("cost");
+		yAxis.setAutoRangeIncludesZero(false);
+		XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
 
-		// NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
+		JFreeChart chart = new JFreeChart(plot);
 
-		// set the background color for the chart...
-		chart.setBackgroundPaint(Color.yellow);
-
-		// get a reference to the plot for further customisation...
-		final CategoryPlot plot = chart.getCategoryPlot();
-		plot.setRenderer(new MinMaxCategoryRenderer());
-		// OPTIONAL CUSTOMISATION COMPLETED.
-
-		// add the chart to a panel...
 		final ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
+		chartPanel.setPreferredSize(new java.awt.Dimension(1000, 700));
 		return chartPanel;
 	}
 }
