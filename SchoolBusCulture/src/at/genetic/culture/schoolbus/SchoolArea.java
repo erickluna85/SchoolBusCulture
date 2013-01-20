@@ -6,7 +6,7 @@ public class SchoolArea {
 	private BusStop[] busStops;
 
 	private int busSize;
-	private double costPerBus = 1000;
+	private double costPerBus = 100;
 	private double costPerKm = 0.7;
 
 	public SchoolArea(BusStop school, BusStop[] busStops, int busSize)
