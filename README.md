@@ -7,6 +7,7 @@ Requirements
 ------------
 
   * [JArgs](https://github.com/purcell/jargs) (or [my fork](https://github.com/white-gecko/jargs))
-    * [jargs-2.0-SNAPSHOT.jar](https://github.com/downloads/white-gecko/jargs/jargs-2.0-SNAPSHOT.jar)
+    * [jargs-2.0-SNAPSHOT.jar](https://github.com/downloads/white-gecko/jargs/jargs-2.0-SNAPSHOT.jar) (my build)
+    * and the official [download section](http://sourceforge.net/projects/jargs/files/jargs/)
   * [Jenes](http://jenes.intelligentia.it/) (we are using 2.1.0 from the [download section](http://sourceforge.net/projects/jenes/files/Jenes/))
   * [JFreeChart](www.jfree.org/jfreechart/) (we are using 1.0.14 from the [download section](http://sourceforge.net/projects/jfreechart/files/), it includes JCommon which you will also need in the Build Path)
