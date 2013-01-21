@@ -32,6 +32,7 @@ public class SchoolBusCulture {
 				.addDoubleOption('m', "mutation");
 		Option<Double> crossoverPropOption = cmd.addDoubleOption('c',
 				"crossover");
+		Option<Boolean> guruOption = cmd.addBooleanOption('g', "guru");
 		Option<Double> costPerBusOption = cmd.addDoubleOption('b', "buscost");
 		Option<Double> costPerKmOption = cmd.addDoubleOption('k', "kmcost");
 		Option<Boolean> helpOption = cmd.addBooleanOption('h', "help");
@@ -49,6 +50,7 @@ public class SchoolBusCulture {
 		int popSize = cmd.getOptionValue(populationSizeOption, 10);
 		double mutationProp = cmd.getOptionValue(mutationPropOption, 0.02);
 		double crossoverProp = cmd.getOptionValue(crossoverPropOption, 0.8);
+		boolean withGuru = cmd.getOptionValue(guruOption, false);
 		Double costPerBus = cmd.getOptionValue(costPerBusOption);
 		Double costPerKm = cmd.getOptionValue(costPerKmOption);
 
@@ -63,7 +65,7 @@ public class SchoolBusCulture {
 		}
 
 		SchoolBusCulture culture = new SchoolBusCulture(areaMap, numGen,
-				popSize, mutationProp, crossoverProp);
+				popSize, withGuru, mutationProp, crossoverProp);
 		culture.run();
 	}
 
@@ -90,7 +92,7 @@ public class SchoolBusCulture {
 	}
 
 	public SchoolBusCulture(SchoolArea area, int numGen, int popSize,
-			double mutationProp, double crossoverProp) {
+			boolean withGuru, double mutationProp, double crossoverProp) {
 		PermutationChromosome sampleChrom = new PermutationChromosome(
 				area.countStops());
 		Individual<PermutationChromosome> sample = new Individual<PermutationChromosome>(
@@ -99,7 +101,7 @@ public class SchoolBusCulture {
 				sample, popSize);
 		Fitness<PermutationChromosome> fit = new ScheduleFitness(area);
 
-		ga = new CulturalGA<PermutationChromosome>(fit, pop, numGen,
+		ga = new CulturalGA<PermutationChromosome>(fit, pop, withGuru, numGen,
 				mutationProp, crossoverProp);
 
 		StatisticListner<PermutationChromosome> listener = new StatisticListner<PermutationChromosome>(
