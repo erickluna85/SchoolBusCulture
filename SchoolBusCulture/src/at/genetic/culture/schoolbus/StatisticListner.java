@@ -16,8 +16,6 @@ import jenes.AlgorithmEventListener;
 import jenes.GenerationEventListener;
 import jenes.GeneticAlgorithm;
 import jenes.chromosome.Chromosome;
-import jenes.chromosome.PermutationChromosome;
-import jenes.population.Fitness;
 import jenes.population.Individual;
 import jenes.population.Population;
 import jenes.population.Population.Statistics;
@@ -47,7 +45,6 @@ public class StatisticListner<T extends Chromosome<?>> implements
 	private void openGui() {
 		JFrame frame = new JFrame("School Bus Culture – Map");
 		JPanel p = new JPanel();
-		// frame.setLayout(new GridLayout());
 		BoxLayout layout = new BoxLayout(p, BoxLayout.PAGE_AXIS);
 		p.setLayout(layout);
 
@@ -61,7 +58,6 @@ public class StatisticListner<T extends Chromosome<?>> implements
 
 		JFrame frame2 = new JFrame("School Bus Culture – Stats");
 		JPanel p2 = new JPanel();
-		// frame.setLayout(new GridLayout());
 		BoxLayout layout2 = new BoxLayout(p, BoxLayout.PAGE_AXIS);
 		p.setLayout(layout2);
 
@@ -83,15 +79,9 @@ public class StatisticListner<T extends Chromosome<?>> implements
 	@Override
 	public void onAlgorithmStop(GeneticAlgorithm<T> ga, long time) {
 
-		Population.Statistics<?> stats = ga.getCurrentPopulation().getStatistics();
+		Population.Statistics<?> stats = ga.getCurrentPopulation()
+				.getStatistics();
 		GeneticAlgorithm.Statistics algostats = ga.getStatistics();
-
-		@SuppressWarnings("unchecked")
-		Fitness<PermutationChromosome> fit = ga.getFitness();
-		System.out.println("Objective: "
-				+ (fit.getBiggerIsBetter()[0] ? "Max! (All true)"
-						: "Min! (None true)"));
-		System.out.println(fit.getBiggerIsBetter().length);
 
 		Group<?> legals = stats.getGroup(Population.LEGALS);
 
@@ -113,19 +103,16 @@ public class StatisticListner<T extends Chromosome<?>> implements
 
 	@Override
 	public void onGeneration(GeneticAlgorithm<T> ga, long time) {
-
 		Statistics<?> stat = ga.getCurrentPopulation().getStatistics();
 		Group<?> legals = stat.getGroup(Population.LEGALS);
-		System.out.println("Current generation: " + ga.getGeneration());
-		System.out.println("\tBest score: " + legals.getMin()[0]);
-		System.out.println("\tAvg score : " + legals.getMean()[0]);
+		System.out.println("Generation: " + ga.getGeneration() + "\tbest: "
+				+ legals.getMin()[0] + "\tavg: " + legals.getMean()[0]);
 
 		min.add(ga.getGeneration(), legals.getMin()[0]);
 		mean.add(ga.getGeneration(), legals.getMean()[0]);
 	}
 
 	public class MapPanel extends JPanel {
-
 		private static final long serialVersionUID = 3927006095992144643L;
 		private SchoolArea area;
 		private int w = 800;
@@ -138,20 +125,13 @@ public class StatisticListner<T extends Chromosome<?>> implements
 		@Override
 		@Transient
 		public Dimension getPreferredSize() {
-			// TODO Auto-generated method stub
 			return new Dimension(w + 40, h + 40);
-			// return super.getPreferredSize();
 		}
 
 		public void paint(Graphics g) {
 
 			BusStop[] stops = area.getAllStops();
-
 			int[] max = getMax(stops);
-
-			System.out.println("Differenz der Punkte: " + max[0] + ", shift: "
-					+ max[1] + ", " + max[2]);
-
 			Graphics2D g2 = (Graphics2D) g;
 
 			Point p;
