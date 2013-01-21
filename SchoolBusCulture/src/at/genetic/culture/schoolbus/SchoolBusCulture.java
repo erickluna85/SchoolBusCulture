@@ -81,6 +81,7 @@ public class SchoolBusCulture {
 		System.out.println("	-k --kmcost	Cost per km (0.7)");
 		System.out.println();
 		System.out.println("Genetic algorithm options:");
+		System.out.println("	-g --guru	Guru option (false)");
 		System.out.println("	-n --numgen	Number of generations (100)");
 		System.out.println("	-p --pop	Size of population (10)");
 		System.out.println("	-m --mutation	Probability for mutation (0.02)");
