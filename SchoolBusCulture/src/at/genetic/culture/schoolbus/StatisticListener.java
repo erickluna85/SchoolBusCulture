@@ -31,7 +31,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-public class StatisticListner<T extends Chromosome<?>> implements
+public class StatisticListener<T extends Chromosome<?>> implements
 		GenerationEventListener<T>, AlgorithmEventListener<T> {
 
 	private SchoolArea area;
@@ -39,7 +39,7 @@ public class StatisticListner<T extends Chromosome<?>> implements
 	private XYSeries min;
 	private XYSeries mean;
 
-	public StatisticListner(SchoolArea area) {
+	public StatisticListener(SchoolArea area) {
 		this.area = area;
 		openGui();
 	}

@@ -105,7 +105,7 @@ public class SchoolBusCulture {
 		ga = new CulturalGA<PermutationChromosome>(fit, pop, withGuru, numGen,
 				mutationProp, crossoverProp);
 
-		StatisticListner<PermutationChromosome> listener = new StatisticListner<PermutationChromosome>(
+		StatisticListener<PermutationChromosome> listener = new StatisticListener<PermutationChromosome>(
 				area);
 		ga.addGenerationEventListener(listener);
 		ga.addAlgorithmEventListener(listener);
