@@ -1,5 +1,6 @@
 package at.genetic.culture.schoolbus;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -34,6 +35,7 @@ public class StatisticListner<T extends Chromosome<?>> implements
 		GenerationEventListener<T>, AlgorithmEventListener<T> {
 
 	private SchoolArea area;
+	private MapPanel mp;
 	private XYSeries min;
 	private XYSeries mean;
 
@@ -48,7 +50,8 @@ public class StatisticListner<T extends Chromosome<?>> implements
 		BoxLayout layout = new BoxLayout(p, BoxLayout.PAGE_AXIS);
 		p.setLayout(layout);
 
-		p.add(new MapPanel(area));
+		mp = new MapPanel(area);
+		p.add(mp);
 
 		frame.add(p, BorderLayout.CENTER);
 
@@ -86,7 +89,9 @@ public class StatisticListner<T extends Chromosome<?>> implements
 		Group<?> legals = stats.getGroup(Population.LEGALS);
 
 		Individual<?> solution = legals.get(0);
-
+		Integer[] path = (Integer[]) solution.getChromosome().toArray();
+		mp.addPath(path);
+		
 		System.out.println("Solution: ");
 		System.out.println(solution.toCompleteString());
 		System.out.format("found in %d ms.\n", algostats.getExecutionTime());
@@ -117,6 +122,7 @@ public class StatisticListner<T extends Chromosome<?>> implements
 		private SchoolArea area;
 		private int w = 800;
 		private int h = 800;
+		private BusStop[] route = null;
 
 		public MapPanel(SchoolArea area) {
 			this.area = area;
@@ -126,6 +132,11 @@ public class StatisticListner<T extends Chromosome<?>> implements
 		@Transient
 		public Dimension getPreferredSize() {
 			return new Dimension(w + 40, h + 40);
+		}
+		
+		public void addPath(Integer[] path) {
+			route = area.getRoute(path);
+			repaint();
 		}
 
 		public void paint(Graphics g) {
@@ -138,14 +149,27 @@ public class StatisticListner<T extends Chromosome<?>> implements
 			g2.setPaint(Color.BLUE);
 			for (int i = 1; i < stops.length; i++) {
 				p = project(stops[i], max[0], max[1], max[2]);
-				int size = stops[i].numberOfPupils;
-				g2.fillOval(p.x, p.y, size, size);
+				int size = (int) Math.sqrt(((double)(32*stops[i].numberOfPupils))/Math.PI);
+				g2.fillOval(p.x-size/2, p.y-size/2, size, size);
+			}
+
+			Point p2;
+		    g2.setStroke(new BasicStroke(2));
+			int c = -1;
+			Color[] color = new Color[] {Color.CYAN, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.GRAY,  Color.PINK, Color.YELLOW, Color.RED};
+			for (int i = 1; i < route.length; i++) {
+				if (route[i-1] == area.school) {
+					c = (c+1)%color.length;
+					g2.setPaint(color[c]);
+				}
+				p = project(route[i-1], max[0], max[1], max[2]);
+				p2 = project(route[i], max[0], max[1], max[2]);
+				g2.drawLine(p.x, p.y, p2.x, p2.y);
 			}
 
 			p = project(stops[0], max[0], max[1], max[2]);
 			g2.setPaint(Color.RED);
-			g2.fillOval(p.x, p.y, 10, 10);
-
+			g2.fillOval(p.x-5, p.y-5, 10, 10);
 		}
 
 		private int[] getMax(BusStop[] stops) {

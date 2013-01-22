@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class SchoolArea {
 
-	private BusStop school;
+	public BusStop school;
 	private BusStop[] busStops;
 
 	private int busSize;
@@ -94,6 +94,31 @@ public class SchoolArea {
 		for (BusStop busStop : busStops) {
 			stops.add(busStop);
 		}
+		
+		return stops.toArray(new BusStop[stops.size()]);
+	}
+	
+	public BusStop[] getRoute (Integer[] path) {
+		ArrayList<BusStop> stops = new ArrayList<BusStop>();
+
+		stops.add(school);
+		
+		int inBus = 0;
+		for (int i = 0; i < path.length; i++) {
+			
+			
+			if (busStops[path[i]].numberOfPupils + inBus > busSize) {
+				// put pupils into bus
+				stops.add(school);
+				stops.add(busStops[path[i]]);
+				inBus = busStops[path[i]].numberOfPupils;
+			} else {
+				stops.add(busStops[path[i]]);
+				inBus += busStops[path[i]].numberOfPupils;
+			}
+			
+		}
+		stops.add(school);
 		
 		return stops.toArray(new BusStop[stops.size()]);
 	}
