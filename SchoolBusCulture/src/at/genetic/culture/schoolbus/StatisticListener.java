@@ -1,7 +1,5 @@
 package at.genetic.culture.schoolbus;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -9,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.Transient;
 
 import javax.swing.BoxLayout;
