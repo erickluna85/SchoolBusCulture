@@ -24,3 +24,7 @@ You always have to specify an Area Map file with the `-a` option.
     $ java -jar SchoolBus.jar -a ./TestSets/2-secondSchool.txt
 
 The programm will have some grafical output for some statistics and a map and will show the solution in the terminal window. So keep an eye on both outputs.
+
+To start the algorithm with our cultural genetic algorithm variation, the guru algorithm you have to specify the `-g` option.
+
+    $ java -jar SchoolBus.jar -g -a ./TestSets/2-secondSchool.txt
