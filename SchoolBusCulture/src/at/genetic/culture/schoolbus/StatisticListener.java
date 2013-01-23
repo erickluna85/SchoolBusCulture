@@ -1,5 +1,7 @@
 package at.genetic.culture.schoolbus;
 
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -10,6 +12,7 @@ import java.awt.Point;
 import java.beans.Transient;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -41,16 +44,24 @@ public class StatisticListener<T extends Chromosome<?>> implements
 
 	public StatisticListener(SchoolArea area) {
 		this.area = area;
-		openGui();
+		openGuiStats();
 	}
 
-	private void openGui() {
-		JFrame frame = new JFrame("School Bus Culture – Map");
-		JPanel p = new JPanel();
+	private void openGuiMap() {
+		final JFrame frame = new JFrame("School Bus Culture – Map");
+		final JPanel p = new JPanel();
 		BoxLayout layout = new BoxLayout(p, BoxLayout.PAGE_AXIS);
 		p.setLayout(layout);
-
+		JButton show = new JButton("Show route");
+		p.add(show);
 		mp = new MapPanel(area);
+		show.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				mp.paintRoute();
+			}
+		});
+
 		p.add(mp);
 
 		frame.add(p, BorderLayout.CENTER);
@@ -58,11 +69,14 @@ public class StatisticListener<T extends Chromosome<?>> implements
 		frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);
+	}
+	
+	private void openGuiStats() {
 
 		JFrame frame2 = new JFrame("School Bus Culture – Stats");
 		JPanel p2 = new JPanel();
-		BoxLayout layout2 = new BoxLayout(p, BoxLayout.PAGE_AXIS);
-		p.setLayout(layout2);
+		BoxLayout layout2 = new BoxLayout(p2, BoxLayout.PAGE_AXIS);
+		p2.setLayout(layout2);
 
 		p2.add(getStatPanel());
 
@@ -90,7 +104,6 @@ public class StatisticListener<T extends Chromosome<?>> implements
 
 		Individual<?> solution = legals.get(0);
 		Integer[] path = (Integer[]) solution.getChromosome().toArray();
-		mp.addPath(path);
 		
 		System.out.println("Solution: ");
 		System.out.println(solution.toCompleteString());
@@ -98,6 +111,11 @@ public class StatisticListener<T extends Chromosome<?>> implements
 		System.out.println();
 
 		Utils.printStatistics(stats);
+		
+		openGuiMap();
+		
+		mp.addPath(path);
+
 	}
 
 	@Override
@@ -138,21 +156,13 @@ public class StatisticListener<T extends Chromosome<?>> implements
 			route = area.getRoute(path);
 			repaint();
 		}
-
-		public void paint(Graphics g) {
-
+		
+		public void paintRoute() {
 			BusStop[] stops = area.getAllStops();
 			int[] max = getMax(stops);
-			Graphics2D g2 = (Graphics2D) g;
+			Graphics2D g2 = (Graphics2D) this.getGraphics();
 
 			Point p;
-			g2.setPaint(Color.BLUE);
-			for (int i = 1; i < stops.length; i++) {
-				p = project(stops[i], max[0], max[1], max[2]);
-				int size = (int) Math.sqrt(((double)(32*stops[i].numberOfPupils))/Math.PI);
-				g2.fillOval(p.x-size/2, p.y-size/2, size, size);
-			}
-
 			Point p2;
 		    g2.setStroke(new BasicStroke(2));
 			int c = -1;
@@ -165,11 +175,38 @@ public class StatisticListener<T extends Chromosome<?>> implements
 				p = project(route[i-1], max[0], max[1], max[2]);
 				p2 = project(route[i], max[0], max[1], max[2]);
 				g2.drawLine(p.x, p.y, p2.x, p2.y);
+				try {
+					  Thread.sleep(100L);    // 100 miliseconds
+					}
+					catch (Exception e) {}
 			}
 
 			p = project(stops[0], max[0], max[1], max[2]);
 			g2.setPaint(Color.RED);
 			g2.fillOval(p.x-5, p.y-5, 10, 10);
+			
+		}
+
+		public void paint(Graphics g) {
+
+			BusStop[] stops = area.getAllStops();
+			int[] max = getMax(stops);
+			Graphics2D g2 = (Graphics2D) g;
+
+			Point p;
+			g2.setPaint(Color.RED);
+			for (int i = 0; i < stops.length; i++) {
+				p = project(stops[i], max[0], max[1], max[2]);
+				if (i>0) {
+					int size = (int) Math.sqrt(((double)(32*stops[i].numberOfPupils))/Math.PI);
+					g2.fillOval(p.x-size/2, p.y-size/2, size, size);
+				}
+				else {
+					g2.fillRect(p.x-7, p.y-7, 14, 14);
+					g2.setPaint(Color.BLUE);
+				}
+			}
+
 		}
 
 		private int[] getMax(BusStop[] stops) {
