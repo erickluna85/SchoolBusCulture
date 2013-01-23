@@ -77,7 +77,7 @@ public class SchoolBusCulture {
 		System.out.println("Problem specific options:");
 		System.out
 				.println("	-a --area	Spezify an file with are setup [mandatory]");
-		System.out.println("	-b --buscost	Cost per bus (1000)");
+		System.out.println("	-b --buscost	Cost per bus (100)");
 		System.out.println("	-k --kmcost	Cost per km (0.7)");
 		System.out.println();
 		System.out.println("Genetic algorithm options:");
