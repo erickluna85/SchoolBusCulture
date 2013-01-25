@@ -47,8 +47,8 @@ public class MapPanel extends JPanel {
 				c = (c+1)%color.length;
 				g2.setPaint(color[c]);
 			}
-			p = project(route[i-1], max[0], max[1], max[2]);
-			p2 = project(route[i], max[0], max[1], max[2]);
+			p = project(route[i-1], max[0], max[1], max[2], max[3]);
+			p2 = project(route[i], max[0], max[1], max[2], max[3]);
 			g2.drawLine(p.x, p.y, p2.x, p2.y);
 			try {
 				  Thread.sleep(100L);    // 100 miliseconds
@@ -56,7 +56,7 @@ public class MapPanel extends JPanel {
 				catch (Exception e) {}
 		}
 
-		p = project(stops[0], max[0], max[1], max[2]);
+		p = project(stops[0], max[0], max[1], max[2], max[3]);
 		g2.setPaint(Color.RED);
 		g2.fillOval(p.x-5, p.y-5, 10, 10);
 		
@@ -75,7 +75,7 @@ public class MapPanel extends JPanel {
 		Point p;
 		g2.setPaint(Color.RED);
 		for (int i = 0; i < stops.length; i++) {
-			p = project(stops[i], max[0], max[1], max[2]);
+			p = project(stops[i], max[0], max[1], max[2], max[3]);
 			if (i>0) {
 				int size = (int) Math.sqrt(((double)(32*stops[i].numberOfPupils))/Math.PI);
 				g2.fillOval(p.x-size/2, p.y-size/2, size, size);
@@ -108,18 +108,21 @@ public class MapPanel extends JPanel {
 		
 		int diffX = minX - maxX;
 		int diffY = minY - maxY;
-		int diff = (diffX > diffY ? diffX : diffY);
+		//int diff = (diffX > diffY ? diffX : diffY);
 
 		int xoffset = minX + (maxX - minX) / 2;
 		int yoffset = minY + (maxY - minY) / 2;
 		
-		return new int[] { diff, xoffset, yoffset };
+		return new int[] { diffX, diffY, xoffset, yoffset };
 	}
 
-	private Point project(BusStop stop, int diff, int xoffset, int yoffset) {
-		double scale = (double) (w<h?w:h) / (double) diff;
-		double shiftY = ((double) h / 2.0) + 20;
+	private Point project(BusStop stop, int diffX, int diffY, int xoffset, int yoffset) {
+		double scaleX = (double) w / (double) diffX;
+		double scaleY = (double) h / (double) diffY;
 		double shiftX = ((double) w / 2.0) + 20;
+		double shiftY = ((double) h / 2.0) + 20;
+		
+		double scale = (scaleX > scaleY ? scaleX : scaleY);
 
 		int x = (int) (((double) stop.x - (double) xoffset) * scale + shiftX);
 		int y = (int) (((double) stop.y - (double) yoffset) * scale + shiftY);
