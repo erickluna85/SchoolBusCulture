@@ -39,7 +39,7 @@ public class StatisticListener<T extends Chromosome<?>> implements
 	public StatisticListener(SchoolArea area) {
 		this.area = area;
 		openGuiStats();
-		
+
 		openGuiMap();
 	}
 
@@ -66,7 +66,7 @@ public class StatisticListener<T extends Chromosome<?>> implements
 		frame.pack();
 		frame.setVisible(true);
 	}
-	
+
 	private void openGuiStats() {
 
 		JFrame frame2 = new JFrame("School Bus Culture – Stats");
@@ -100,14 +100,20 @@ public class StatisticListener<T extends Chromosome<?>> implements
 
 		Individual<?> solution = legals.get(0);
 		Integer[] path = (Integer[]) solution.getChromosome().toArray();
-		
+
 		System.out.println("Solution: ");
 		System.out.println(solution.toCompleteString());
 		System.out.format("found in %d ms.\n", algostats.getExecutionTime());
 		System.out.println();
 
 		Utils.printStatistics(stats);
-		
+
+		double[] costs = area.getCostsForSchedule(path);
+
+		System.out.println("buscosts: " + costs[1] + " (at " + area.costPerBus
+				+ " €/bus), kilometer costs: " + costs[0] + " (at " + area.costPerKm
+				+ " €/km) → " + (costs[0] + costs[1]) + " €/day Σ");
+
 		mp.addPath(path);
 		show.setText("Show route");
 		show.setEnabled(true);

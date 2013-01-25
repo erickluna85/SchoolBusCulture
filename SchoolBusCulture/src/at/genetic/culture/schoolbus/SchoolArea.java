@@ -8,8 +8,8 @@ public class SchoolArea {
 	private BusStop[] busStops;
 
 	private int busSize;
-	private double costPerBus = 100;
-	private double costPerKm = 0.7;
+	public double costPerBus = 100;
+	public double costPerKm = 0.7;
 
 	public SchoolArea(BusStop school, BusStop[] busStops, int busSize)
 			throws Exception {
@@ -36,6 +36,13 @@ public class SchoolArea {
 		this.costPerKm = costPerKm;
 	}
 
+	public double[] getCostsForSchedule(Integer[] schedule) {
+		int[] s = new int[schedule.length];
+		for (int i = 0; i < schedule.length; i++) {
+			s[i] = schedule[i];
+		}
+		return getCostsForSchedule(s);
+	}
 	public double[] getCostsForSchedule(int[] schedule) {
 		if (schedule.length != busStops.length) {
 			// throw new Exception("The given schedule with " + schedule.length
