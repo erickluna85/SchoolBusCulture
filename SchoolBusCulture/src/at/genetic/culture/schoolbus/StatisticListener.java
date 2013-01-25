@@ -34,10 +34,13 @@ public class StatisticListener<T extends Chromosome<?>> implements
 	private MapPanel mp;
 	private XYSeries min;
 	private XYSeries mean;
+	private JButton show;
 
 	public StatisticListener(SchoolArea area) {
 		this.area = area;
 		openGuiStats();
+		
+		openGuiMap();
 	}
 
 	private void openGuiMap() {
@@ -45,7 +48,7 @@ public class StatisticListener<T extends Chromosome<?>> implements
 		final JPanel p = new JPanel();
 		BoxLayout layout = new BoxLayout(p, BoxLayout.PAGE_AXIS);
 		p.setLayout(layout);
-		JButton show = new JButton("Show route");
+		show = new JButton("Show route");
 		p.add(show);
 		mp = new MapPanel(area);
 		show.addActionListener(new ActionListener() {
@@ -82,6 +85,8 @@ public class StatisticListener<T extends Chromosome<?>> implements
 
 	@Override
 	public void onAlgorithmStart(GeneticAlgorithm<T> ga, long time) {
+		show.setEnabled(false);
+		show.setText("Calculating route …");
 	}
 
 	@Override
@@ -103,9 +108,9 @@ public class StatisticListener<T extends Chromosome<?>> implements
 
 		Utils.printStatistics(stats);
 		
-		openGuiMap();
-		
 		mp.addPath(path);
+		show.setText("Show route");
+		show.setEnabled(true);
 
 	}
 
