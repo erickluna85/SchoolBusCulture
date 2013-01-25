@@ -43,12 +43,12 @@ public class SchoolArea {
 			// ".");
 		}
 
-		int kmCosts = 0;
-		int busCosts = 0;
+		double kmCosts = 0;
+		double busCosts = 0;
 		int inBus = 0;
 		boolean atSchool = true;
 
-		// TODO way from school to first stop
+		// way from school to first stop
 		busCosts += costPerBus; // first bus
 		kmCosts += distance(school, busStops[schedule[0]]) * costPerKm;
 
@@ -124,7 +124,7 @@ public class SchoolArea {
 	}
 
 	private double distance(BusStop a, BusStop b) {
-		// System.out.println("dist between " + a + " and " + b);
-		return Math.sqrt((a.x + b.x) * (a.x + b.x) + (a.y + b.y) * (a.y + b.y));
+		double ax = a.x, bx = b.x, ay = a.y, by = b.y;
+		return Math.sqrt((ax - bx) * (ax - bx) + (ay - by) * (ay - by));
 	}
 }
